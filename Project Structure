@@ -1,0 +1,23 @@
+// Project Structure:
+// lib/
+// ├── main.dart
+// ├── models/
+// │   ├── coffee_model.dart
+// │   └── user_model.dart
+// ├── views/
+// │   ├── signin_view.dart
+// │   ├── create_user_view.dart
+// │   ├── main_menu_view.dart
+// │   ├── update_profile_view.dart
+// │   ├── make_coffee_view.dart
+// │   └── statistics_view.dart
+// ├── controllers/
+// │   ├── auth_controller.dart
+// │   ├── coffee_controller.dart
+// │   └── user_controller.dart
+// ├── services/
+// │   ├── api_service.dart
+// │   └── local_storage_service.dart
+// └── utils/
+//     ├── routes.dart
+//     └── constants.dart
