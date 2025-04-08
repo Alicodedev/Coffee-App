@@ -1,3 +1,5 @@
+// lib/main.dart
+
 import 'package:flutter/material.dart';
 import 'utils/routes.dart';
 
@@ -9,12 +11,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MVC Example App',
+      title: 'Coffee App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.brown,
+        scaffoldBackgroundColor: Colors.brown[50],
       ),
       routes: Routes.getRoutes(),
-      initialRoute: Routes.userProfile,
+      initialRoute: Routes.mainMenu,
     );
   }
 }
