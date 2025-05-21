@@ -6,6 +6,8 @@ import '../models/coffee_model.dart';
 import '../utils/routes.dart';
 
 class MainMenuView extends StatefulWidget {
+  const MainMenuView({super.key});
+
   @override
   _MainMenuViewState createState() => _MainMenuViewState();
 }
@@ -150,7 +152,7 @@ class _MainMenuViewState extends State<MainMenuView> {
       IconData icon,
       String route,
       ) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 60,
       child: ElevatedButton(

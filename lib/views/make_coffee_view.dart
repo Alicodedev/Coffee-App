@@ -5,6 +5,8 @@ import '../controllers/coffee_controller.dart';
 import '../models/coffee_model.dart';
 
 class MakeCoffeeView extends StatefulWidget {
+  const MakeCoffeeView({super.key});
+
   @override
   _MakeCoffeeViewState createState() => _MakeCoffeeViewState();
 }
@@ -138,14 +140,14 @@ class _MakeCoffeeViewState extends State<MakeCoffeeView> {
               onPressed: () {
                 // Handle the order
                 _controller.selectCoffee(coffee);
-                print('Ordered: ${selectedSize} ${coffee.flavorName}');
+                print('Ordered: $selectedSize ${coffee.flavorName}');
                 Navigator.of(context).pop();
 
                 // Show confirmation
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                        'Ordered: ${selectedSize} ${coffee.flavorName}'
+                        'Ordered: $selectedSize ${coffee.flavorName}'
                     ),
                     duration: Duration(seconds: 2),
                   ),

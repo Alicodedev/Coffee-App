@@ -5,6 +5,8 @@ import '../models/user_model.dart';
 class UserListView extends StatelessWidget {
   final UserController _userController = UserController();
 
+  UserListView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

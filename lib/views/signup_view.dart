@@ -6,6 +6,8 @@ import '../utils/routes.dart'; // deals with routing this View(V)
 import '../controllers/signup_controller.dart'; // Signup controller(C)
 
 class SignupView extends StatefulWidget {
+  const SignupView({super.key});
+
   
   @override
   _SignupViewState createState() => _SignupViewState();
@@ -37,6 +39,8 @@ class _SignupViewState extends State<SignupView> {
 }
 
 class CreateUserForm extends StatefulWidget {
+  const CreateUserForm({super.key});
+
   // class for create user form validation
   @override
   _UserFormState createState() => _UserFormState();
@@ -45,11 +49,11 @@ class CreateUserForm extends StatefulWidget {
 class _UserFormState extends State<CreateUserForm> {
   final _formKey = GlobalKey<FormState>();
   // Controller fields
-  var _nameFieldController = TextEditingController(); // username
-  var _emailFieldController = TextEditingController(); // email
-  var _phoneFieldController = TextEditingController(); // phone number
-  var _passwordFieldController = TextEditingController(); // password
-  var _ConfirmPassFieldController = TextEditingController(); // confirm password
+  final _nameFieldController = TextEditingController(); // username
+  final _emailFieldController = TextEditingController(); // email
+  final _phoneFieldController = TextEditingController(); // phone number
+  final _passwordFieldController = TextEditingController(); // password
+  final _ConfirmPassFieldController = TextEditingController(); // confirm password
 
 
 bool isValidEmail(String input) {
@@ -106,12 +110,12 @@ void _showAlert(
     desc: message,
     buttons: [
       DialogButton(
+        onPressed: () => Navigator.pop(context),
+        width: 120,
         child: Text(
           "OK",
           style: TextStyle(color: Colors.white, fontSize: 18),
         ),
-        onPressed: () => Navigator.pop(context),
-        width: 120,
       )
     ],
   ).show();
