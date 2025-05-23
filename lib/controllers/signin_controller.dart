@@ -1,16 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import '../models/signin_model.dart';
 
-class SignupController {
+class SigninController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<User?> signUp(String email, String password) async {
+  Future<User?> signIn(String email, String password) async {
     try {
-      UserCredential result = await _auth.createUserWithEmailAndPassword(
+      UserCredential result = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
-        // username: username,
-        // phone: phone,
-        // confirmPassword: confirmPassword,
       );
       return result.user;
     } catch (e) {

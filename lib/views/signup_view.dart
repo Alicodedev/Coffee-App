@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import '../models/signup_model.dart'; // Signup model (M)
 import '../utils/routes.dart'; // deals with routing this View(V)
-import '../controllers/signup_controller.dart'; // Signup controller(C)
+import '../controllers/Signup_controller.dart'; // Corrected import casing
 
 class SignupView extends StatefulWidget {
   const SignupView({super.key});
@@ -49,11 +49,11 @@ class CreateUserForm extends StatefulWidget {
 class _UserFormState extends State<CreateUserForm> {
   final _formKey = GlobalKey<FormState>();
   // Controller fields
-  final _nameFieldController = TextEditingController(); // username
+  //final _nameFieldController = TextEditingController(); // username
   final _emailFieldController = TextEditingController(); // email
-  final _phoneFieldController = TextEditingController(); // phone number
+ // final _phoneFieldController = TextEditingController(); // phone number
   final _passwordFieldController = TextEditingController(); // password
-  final _ConfirmPassFieldController = TextEditingController(); // confirm password
+ // final _ConfirmPassFieldController = TextEditingController(); // confirm password
 
 
 bool isValidEmail(String input) {
@@ -62,10 +62,10 @@ bool isValidEmail(String input) {
   return emailRegExp.hasMatch(input);
 }
 
-bool isValidPhoneNumber(String input) {
-  final phoneRegExp = RegExp(r'^\d{10}$');
-  return phoneRegExp.hasMatch(input);
-}
+//   bool isValidPhoneNumber(String input) {
+//     final phoneRegExp = RegExp(r'^\d{10}$');
+//     return phoneRegExp.hasMatch(input);
+// }
 
 bool isValidPassword(String input) {
   if (input.length < 6) {
@@ -131,18 +131,18 @@ void _showAlert(
         key: _formKey,
         child: Column(
           children: [
-            TextFormField(
-              decoration: InputDecoration(
-                icon: Icon(Icons.person),
-                hintText: 'Enter your name',
-                labelText: 'Name',
-              ),
-              controller: _nameFieldController,
-              validator: (val) {
-                if (val == null || val.isEmpty) return 'Name is required';
-                return null;
-              },
-            ),
+            // TextFormField(
+            //   decoration: InputDecoration(
+            //     icon: Icon(Icons.person),
+            //     hintText: 'Enter your name',
+            //     labelText: 'Name',
+            //   ),
+            //   controller: _nameFieldController,
+            //   validator: (val) {
+            //     if (val == null || val.isEmpty) return 'Name is required';
+            //     return null;
+            //   },
+            // ),
             TextFormField(
               decoration: InputDecoration(
                 icon: Icon(Icons.email),
@@ -152,19 +152,19 @@ void _showAlert(
               controller: _emailFieldController,
               validator: (val) => isValidEmail(val!) ? null : 'Invalid email',
             ),
-            TextFormField(
-              decoration: InputDecoration(
-                icon: Icon(Icons.phone),
-                hintText: 'Enter Phone number',
-                labelText: 'Phone number',
-              ),
-              controller: _phoneFieldController,
-              validator: (val) {
-                if (val == null || val.isEmpty) return 'Phone number is required';
-                if (!isValidPhoneNumber(val)) return 'Phone number must be 10 digits';
-                return null;
-              },
-            ),
+            // TextFormField(
+            //   decoration: InputDecoration(
+            //     icon: Icon(Icons.phone),
+            //     hintText: 'Enter Phone number',
+            //     labelText: 'Phone number',
+            //   ),
+            //   controller: _phoneFieldController,
+            //   validator: (val) {
+            //     if (val == null || val.isEmpty) return 'Phone number is required';
+            //     if (!isValidPhoneNumber(val)) return 'Phone number must be 10 digits';
+            //     return null;
+            //   },
+            // ),
             TextFormField(
               decoration: InputDecoration(
                 icon: Icon(Icons.lock),
@@ -179,31 +179,60 @@ void _showAlert(
                 return null;
               },
             ),
-            TextFormField(
-              decoration: InputDecoration(
-                icon: Icon(Icons.lock),
-                hintText: 'Confirm password',
-                labelText: 'Enter password again',
-              ),
-              obscureText: true,
-              controller: _ConfirmPassFieldController,
-              validator: (val) {
-                if (val == null || val.isEmpty) return 'Confirm password is required';
-                if (val != _passwordFieldController.text) return 'Passwords do not match';
-                return null;
-              },
-            ),
+            // TextFormField(
+            //   decoration: InputDecoration(
+            //     icon: Icon(Icons.lock),
+            //     hintText: 'Confirm password',
+            //     labelText: 'Enter password again',
+            //   ),
+            //   obscureText: true,
+            //   controller: _ConfirmPassFieldController,
+            //   validator: (val) {
+            //     if (val == null || val.isEmpty) return 'Confirm password is required';
+            //     if (val != _passwordFieldController.text) return 'Passwords do not match';
+            //     return null;
+            //   },
+            // ),
             SizedBox(height: 20),
             ElevatedButton(
               child: Text('Submit'),
-              onPressed: () {
+              onPressed: () async { // Make onPressed async
                 if (_formKey.currentState!.validate()) {
-                  _showAlert(
-                    context,
-                    'Success',
-                    'Form submitted successfully!',
-                    AlertType.success,
-                  );
+                  try {
+                    final user = await SignupController().signUp(
+                      _emailFieldController.text,
+                      _passwordFieldController.text,
+                    );
+
+                    if (user != null) {
+                      // User created successfully in Firebase Auth
+                      // Now, you would typically save additional user details
+                      // For example: await _signupController.saveUserDetails(user.uid, _nameFieldController.text, _phoneFieldController.text);
+                      _showAlert(
+                        context,
+                        'Success',
+                        'Account created successfully!',
+                        AlertType.success,
+                      );
+                      // TODO: Navigate to another screen, e.g., Main Menu or Signin
+                    } else {
+                      // This case should ideally be caught by the catch block if signUp throws an error
+                      _showAlert(
+                        context,
+                        'Error',
+                        'Could not create account. Please try again.',
+                        AlertType.error,
+                      );
+                    }
+                  } catch (e) {
+                    // Handle errors from Firebase (e.g., email already in use, weak password)
+                    _showAlert(
+                      context,
+                      'Error',
+                      'Signup failed: ${e.toString()}',
+                      AlertType.error,
+                    );
+                  }
                 } else {
                   _showAlert(
                     context,
