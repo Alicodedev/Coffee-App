@@ -155,6 +155,7 @@ void _showAlert(
                       _passwordFieldController.text,
                     );
                     if (user != null) {
+                      Navigator.pushNamed(context, Routes.mainMenu);
                       _showAlert(
                         context,
                         'Success',

@@ -9,7 +9,7 @@ class ApiConstants {
     'X-API-Key': apiKey,
   };
 
-  static String getCoffeeUrl({int count = 5}) {
+  static String getCoffeeUrl({int count = 5}) { // constructs the url for the coffee api end point
     return '$coffeeBaseUrl?count=$count&key=$apiKey';
   }
 

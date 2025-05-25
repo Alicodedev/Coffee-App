@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../controllers/coffee_controller.dart';
 import '../models/coffee_model.dart';
 import '../utils/routes.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 
 class MainMenuView extends StatefulWidget {
   const MainMenuView({super.key});
@@ -14,7 +15,27 @@ class MainMenuView extends StatefulWidget {
 
 class _MainMenuViewState extends State<MainMenuView> {
   final CoffeeController _controller = CoffeeController();
+  final fb_auth.FirebaseAuth _firebaseAuth = fb_auth.FirebaseAuth.instance;
+  fb_auth.User? _currentUser;
   bool showFavorites = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUser = _firebaseAuth.currentUser;
+  }
+
+  Future<void> _signOut(BuildContext context) async {
+    try {
+      await _firebaseAuth.signOut();
+      Navigator.of(context).pushNamedAndRemoveUntil(Routes.signin, (Route<dynamic> route) => false);
+    } catch (e) {
+      print("Error signing out: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error signing out: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +44,19 @@ class _MainMenuViewState extends State<MainMenuView> {
         title: Text('Coffee App'),
         backgroundColor: Colors.brown,
         actions: [
+          // Username text
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                _currentUser?.displayName ?? _currentUser?.email?.split('@')[0] ?? 'User',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
           // Favorites toggle button
           IconButton(
             icon: Icon(
@@ -35,6 +69,13 @@ class _MainMenuViewState extends State<MainMenuView> {
               });
             },
           ),
+          // Logout button
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+            onPressed: () => _signOut(context),
+          ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Column(

@@ -4,6 +4,7 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import '../models/signup_model.dart'; // Signup model (M)
 import '../utils/routes.dart'; // deals with routing this View(V)
 import '../controllers/Signup_controller.dart'; // Corrected import casing
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 
 class SignupView extends StatefulWidget {
   const SignupView({super.key});
@@ -21,6 +22,7 @@ class _SignupViewState extends State<SignupView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sign up page'),
+        backgroundColor: Colors.brown,
       ),
      
       body: Center(
@@ -48,80 +50,74 @@ class CreateUserForm extends StatefulWidget {
 
 class _UserFormState extends State<CreateUserForm> {
   final _formKey = GlobalKey<FormState>();
-  // Controller fields
-  //final _nameFieldController = TextEditingController(); // username
+  final _usernameController = TextEditingController();
   final _emailFieldController = TextEditingController(); // email
- // final _phoneFieldController = TextEditingController(); // phone number
   final _passwordFieldController = TextEditingController(); // password
- // final _ConfirmPassFieldController = TextEditingController(); // confirm password
 
-
-bool isValidEmail(String input) {
-  final emailRegExp =
-      RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-  return emailRegExp.hasMatch(input);
-}
-
-//   bool isValidPhoneNumber(String input) {
-//     final phoneRegExp = RegExp(r'^\d{10}$');
-//     return phoneRegExp.hasMatch(input);
-// }
-
-bool isValidPassword(String input) {
-  if (input.length < 6) {
-    // Check for minimum length
-    return false;
+  bool isValidEmail(String input) {
+    final emailRegExp =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return emailRegExp.hasMatch(input);
   }
 
-  if (!RegExp(r'[A-Z]').hasMatch(input)) {
-    // Check for at least one uppercase letter
-    return false;
+  bool isValidUsername(String input) {
+    // Username should be 3-20 characters, alphanumeric and underscores only
+    final usernameRegExp = RegExp(r'^[a-zA-Z0-9_]{3,20}$');
+    return usernameRegExp.hasMatch(input);
   }
 
-  if (!RegExp(r'[a-z]').hasMatch(input)) {
-    // Check for at least one lowercase letter
-    return false;
+  bool isValidPassword(String input) {
+    if (input.length < 6) {
+      // Check for minimum length
+      return false;
+    }
+
+    if (!RegExp(r'[A-Z]').hasMatch(input)) {
+      // Check for at least one uppercase letter
+      return false;
+    }
+
+    if (!RegExp(r'[a-z]').hasMatch(input)) {
+      // Check for at least one lowercase letter
+      return false;
+    }
+
+    if (!RegExp(r'[0-9]').hasMatch(input)) {
+      // Check for at least one number
+      return false;
+    }
+
+    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(input)) {
+      // Check for at least one special character
+      return false;
+    }
+
+    if (input.contains(' ')) {
+      // Check for no spaces
+      return false;
+    }
+    return true;
   }
 
-  if (!RegExp(r'[0-9]').hasMatch(input)) {
-    // Check for at least one number
-    return false;
+  void _showAlert(
+      BuildContext context, String title, String message, AlertType alertType) {
+    Alert(
+      context: context,
+      type: alertType,
+      title: title,
+      desc: message,
+      buttons: [
+        DialogButton(
+          onPressed: () => Navigator.pop(context),
+          width: 120,
+          child: Text(
+            "OK",
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        )
+      ],
+    ).show();
   }
-
-  if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(input)) {
-    // Check for at least one special character
-    return false;
-  }
-
-  if (input.contains(' ')) {
-    // Check for no spaces
-    return false;
-  }
-  return true;
-}
-
-
-void _showAlert(
-    BuildContext context, String title, String message, AlertType alertType) {
-  Alert(
-    context: context,
-    type: alertType,
-    title: title,
-    desc: message,
-    buttons: [
-      DialogButton(
-        onPressed: () => Navigator.pop(context),
-        width: 120,
-        child: Text(
-          "OK",
-          style: TextStyle(color: Colors.white, fontSize: 18),
-        ),
-      )
-    ],
-  ).show();
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -131,18 +127,20 @@ void _showAlert(
         key: _formKey,
         child: Column(
           children: [
-            // TextFormField(
-            //   decoration: InputDecoration(
-            //     icon: Icon(Icons.person),
-            //     hintText: 'Enter your name',
-            //     labelText: 'Name',
-            //   ),
-            //   controller: _nameFieldController,
-            //   validator: (val) {
-            //     if (val == null || val.isEmpty) return 'Name is required';
-            //     return null;
-            //   },
-            // ),
+            // Username field
+            TextFormField(
+              decoration: InputDecoration(
+                icon: Icon(Icons.person),
+                hintText: 'Enter your username',
+                labelText: 'Username',
+              ),
+              controller: _usernameController,
+              validator: (val) {
+                if (val == null || val.isEmpty) return 'Username is required';
+                if (!isValidUsername(val)) return 'Username must be 3-20 characters, letters, numbers, and underscores only';
+                return null;
+              },
+            ),
             TextFormField(
               decoration: InputDecoration(
                 icon: Icon(Icons.email),
@@ -152,19 +150,6 @@ void _showAlert(
               controller: _emailFieldController,
               validator: (val) => isValidEmail(val!) ? null : 'Invalid email',
             ),
-            // TextFormField(
-            //   decoration: InputDecoration(
-            //     icon: Icon(Icons.phone),
-            //     hintText: 'Enter Phone number',
-            //     labelText: 'Phone number',
-            //   ),
-            //   controller: _phoneFieldController,
-            //   validator: (val) {
-            //     if (val == null || val.isEmpty) return 'Phone number is required';
-            //     if (!isValidPhoneNumber(val)) return 'Phone number must be 10 digits';
-            //     return null;
-            //   },
-            // ),
             TextFormField(
               decoration: InputDecoration(
                 icon: Icon(Icons.lock),
@@ -179,24 +164,17 @@ void _showAlert(
                 return null;
               },
             ),
-            // TextFormField(
-            //   decoration: InputDecoration(
-            //     icon: Icon(Icons.lock),
-            //     hintText: 'Confirm password',
-            //     labelText: 'Enter password again',
-            //   ),
-            //   obscureText: true,
-            //   controller: _ConfirmPassFieldController,
-            //   validator: (val) {
-            //     if (val == null || val.isEmpty) return 'Confirm password is required';
-            //     if (val != _passwordFieldController.text) return 'Passwords do not match';
-            //     return null;
-            //   },
-            // ),
             SizedBox(height: 20),
             ElevatedButton(
-              child: Text('Submit'),
-              onPressed: () async { // Make onPressed async
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.brown,
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+              ),
+              child: Text(
+                'Sign Up',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   try {
                     final user = await SignupController().signUp(
@@ -205,27 +183,24 @@ void _showAlert(
                     );
 
                     if (user != null) {
-                      // User created successfully in Firebase Auth
-                      // Now, you would typically save additional user details
-                      // For example: await _signupController.saveUserDetails(user.uid, _nameFieldController.text, _phoneFieldController.text);
+                      // Set the display name for the user
+                      await user.updateDisplayName(_usernameController.text);
+                      
                       _showAlert(
                         context,
                         'Success',
                         'Account created successfully!',
                         AlertType.success,
                       );
-                      // TODO: Navigate to another screen, e.g., Main Menu or Signin
-                    } else {
-                      // This case should ideally be caught by the catch block if signUp throws an error
-                      _showAlert(
+                      
+                      // Navigate to sign in page after successful signup
+                      Navigator.pushNamedAndRemoveUntil(
                         context,
-                        'Error',
-                        'Could not create account. Please try again.',
-                        AlertType.error,
+                        Routes.signin,
+                        (Route<dynamic> route) => false,
                       );
                     }
                   } catch (e) {
-                    // Handle errors from Firebase (e.g., email already in use, weak password)
                     _showAlert(
                       context,
                       'Error',
@@ -233,13 +208,6 @@ void _showAlert(
                       AlertType.error,
                     );
                   }
-                } else {
-                  _showAlert(
-                    context,
-                    'Error',
-                    'Please fix the errors in the form.',
-                    AlertType.error,
-                  );
                 }
               },
             ),
